@@ -71,4 +71,15 @@ public class Comment {
     public void setHearts(int hearts) {
         this.hearts = hearts;
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+//                ", user=" + user +
+                ", blogpost=" + blogpost +
+                ", content='" + content + '\'' +
+                ", hearts=" + hearts +
+                '}';
+    }
 }

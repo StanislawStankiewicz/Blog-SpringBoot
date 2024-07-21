@@ -1,8 +1,7 @@
 package com.blog.blogspringboot;
 
-import com.blog.blogspringboot.dao.BlogsiteDAO;
-import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.User;
+import com.blog.blogspringboot.service.BlogpostService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,14 +17,11 @@ public class BlogSpringBootApplication {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(BlogsiteDAO blogsiteDAO) {
-        return args -> createBlogpost(blogsiteDAO);
+    public CommandLineRunner commandLineRunner(BlogpostService blogpostService) {
+        return args -> createBlogpost(blogpostService);
     }
 
-    private void createBlogpost(BlogsiteDAO blogsiteDAO) {
-        // Create a blogpost
-        User user = blogsiteDAO.getUser(1);
-
-        blogsiteDAO.createBlogpost(new Blogpost(user, "title", "content", 0, new Date(), null));
+    private void createBlogpost(BlogpostService blogpostService) {
+        System.out.println(blogpostService.getBlogpostById(1));
     }
 }
