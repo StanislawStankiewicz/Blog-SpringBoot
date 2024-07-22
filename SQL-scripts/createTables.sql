@@ -8,6 +8,7 @@ CREATE TABLE Users (
                        id INT NOT NULL AUTO_INCREMENT,
                        username VARCHAR(45),
                        email VARCHAR(45),
+                       created_at DATETIME,
                        PRIMARY KEY (id),
                        UNIQUE INDEX id_UNIQUE (id ASC)
 );
@@ -37,6 +38,7 @@ CREATE TABLE Comments (
                           blogpost_id INT,
                           content TINYTEXT,
                           hearts INT,
+                          created_at DATETIME,
                           PRIMARY KEY (id),
                           UNIQUE INDEX id_UNIQUE (id ASC),
                           INDEX fk_Comments_Blogposts1_idx (blogpost_id ASC),

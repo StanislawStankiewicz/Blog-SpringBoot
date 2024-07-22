@@ -3,6 +3,8 @@ package com.blog.blogspringboot.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -23,6 +25,10 @@ public class Comment {
     private String content;
 
     private int hearts;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
     public Comment() {
     }
@@ -74,6 +80,14 @@ public class Comment {
         this.hearts = hearts;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
@@ -82,6 +96,7 @@ public class Comment {
                 ", blogpost=" + blogpost +
                 ", content='" + content + '\'' +
                 ", hearts=" + hearts +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

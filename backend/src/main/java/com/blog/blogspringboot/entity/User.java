@@ -2,6 +2,8 @@ package com.blog.blogspringboot.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -16,6 +18,10 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
 //    @JsonManagedReference
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
