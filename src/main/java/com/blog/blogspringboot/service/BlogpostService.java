@@ -35,4 +35,7 @@ public class BlogpostService {
         blogpostRepository.deleteById(id);
     }
 
+    public Page<Blogpost> getAllBlogpostsByUserId(Integer userId, Pageable pageable) {
+        return blogpostRepository.findAllByUserId(userId, pageable);
+    }
 }

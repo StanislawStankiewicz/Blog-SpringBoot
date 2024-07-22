@@ -14,7 +14,7 @@ public class LoggingAspect {
 
     private static final Log log = LogFactory.getLog(LoggingAspect.class);
 
-    @Pointcut("execution(* com.blog.blogspringboot.service.*.*(..))")
+    @Pointcut("execution(* com.blog.blogspringboot.controller.*.*(..))")
     public void servicePointcut() {}
 
     @Before("servicePointcut()")
