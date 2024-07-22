@@ -1,5 +1,6 @@
 package com.blog.blogspringboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -28,6 +29,7 @@ public class Blogpost {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "blogpost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments;
 

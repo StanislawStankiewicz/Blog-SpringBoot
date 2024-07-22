@@ -1,5 +1,6 @@
 package com.blog.blogspringboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.Set;
 
@@ -16,20 +17,22 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Blogpost> blogposts;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Comment> comments;
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private Set<Blogpost> blogposts;
+//
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private Set<Comment> comments;
 
     public User() {
     }
 
-    public User(String username, String email, Set<Blogpost> blogposts, Set<Comment> comments) {
+    public User(String username, String email) {
         this.username = username;
         this.email = email;
-        this.blogposts = blogposts;
-        this.comments = comments;
+//        this.blogposts = blogposts;
+//        this.comments = comments;
     }
 
     public int getId() {
@@ -56,21 +59,21 @@ public class User {
         this.email = email;
     }
 
-    public Set<Blogpost> getBlogposts() {
-        return blogposts;
-    }
-
-    public void setBlogposts(Set<Blogpost> blogposts) {
-        this.blogposts = blogposts;
-    }
-
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }
+//    public Set<Blogpost> getBlogposts() {
+//        return blogposts;
+//    }
+//
+//    public void setBlogposts(Set<Blogpost> blogposts) {
+//        this.blogposts = blogposts;
+//    }
+//
+//    public Set<Comment> getComments() {
+//        return comments;
+//    }
+//
+//    public void setComments(Set<Comment> comments) {
+//        this.comments = comments;
+//    }
 
     @Override
     public String toString() {
@@ -78,7 +81,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", blogposts=" + blogposts +
+//                ", blogposts=" + blogposts +
 //                ", comments=" + comments +
                 '}';
     }

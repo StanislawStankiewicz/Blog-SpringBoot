@@ -4,10 +4,9 @@ import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.repository.BlogpostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -24,12 +23,12 @@ public class BlogpostService {
         return blogpostRepository.save(blogpost);
     }
 
-    public Optional<Blogpost> getBlogpostById(int id) {
-        return blogpostRepository.findById(id);
+    public Blogpost getBlogpostById(int id) {
+        return blogpostRepository.findById(id).orElse(null);
     }
 
-    public List<Blogpost> getAllBlogposts() {
-        return blogpostRepository.findAll();
+    public Page<Blogpost> getAllBlogposts(Pageable pageable) {
+        return blogpostRepository.findAll(pageable);
     }
 
     public void deleteBlogpost(int id) {
