@@ -1,4 +1,4 @@
-package com.blog.blogspringboot.security;
+package com.blog.blogspringboot.security.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

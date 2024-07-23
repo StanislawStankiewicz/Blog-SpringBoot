@@ -1,4 +1,4 @@
-package com.blog.blogspringboot.security;
+package com.blog.blogspringboot.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

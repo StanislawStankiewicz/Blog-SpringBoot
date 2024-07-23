@@ -1,8 +1,20 @@
 -- Insert data into Users table
-INSERT INTO Users (username, email, created_at) VALUES
-                                        ('john_doe', 'john@example.com', NOW()),
-                                        ('jane_smith', 'jane@example.com', NOW()),
-                                        ('alice_jones', 'alice@example.com', NOW());
+INSERT INTO Users (username, email, password, created_at) VALUES
+                                        ('john_doe', 'john@example.com', "123", NOW()),
+                                        ('jane_smith', 'jane@example.com', "123", NOW()),
+                                        ('alice_jones', 'alice@example.com', "123", NOW());
+
+-- Insert data into Roles table
+INSERT INTO Roles (name) VALUES
+                        ('ROLE_ADMIN'),
+                        ('ROLE_EDITOR'),
+                        ('ROLE_USER');
+
+-- Insert data into user_roles table
+INSERT INTO user_roles (user_id, role_id) VALUES
+                                        (1, 1),
+                                        (2, 2),
+                                        (3, 3);
 
 -- Insert data into Blogposts table
 INSERT INTO Blogposts (user_id, title, content, hearts, created_at) VALUES

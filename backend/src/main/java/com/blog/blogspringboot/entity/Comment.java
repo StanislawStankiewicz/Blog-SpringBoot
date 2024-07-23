@@ -34,8 +34,7 @@ public class Comment {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    public Comment() {
-    }
+    public Comment() {}
 
     public Comment(User user, Blogpost blogpost, String content, int hearts) {
         this.user = user;
@@ -48,8 +47,6 @@ public class Comment {
     public String toString() {
         return "Comment{" +
                 "id=" + id +
-//                ", user=" + user +
-                ", blogpost=" + blogpost +
                 ", content='" + content + '\'' +
                 ", hearts=" + hearts +
                 ", createdAt=" + createdAt +

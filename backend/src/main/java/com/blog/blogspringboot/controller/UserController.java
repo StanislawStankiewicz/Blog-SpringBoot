@@ -1,10 +1,12 @@
 package com.blog.blogspringboot.controller;
 
 import com.blog.blogspringboot.entity.User;
+import com.blog.blogspringboot.security.UserPrincipal;
 import com.blog.blogspringboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +26,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable int id) {
+    public ResponseEntity<?> getUserById(@AuthenticationPrincipal UserPrincipal principal, @PathVariable int id) {
         User user = userService.getUserById(id);
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("message", "No user found with ID " + id));
+                    .body(Collections.singletonMap("message", "No user found with ID " + id + "Btw you are " + principal.getUsername()));
         }
         return ResponseEntity.ok(user);
     }
