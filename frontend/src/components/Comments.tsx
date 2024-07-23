@@ -2,9 +2,15 @@ import { useState } from "react";
 import { Comment as CommentT } from "../types/Comment.type";
 import { formatDate } from "../utils/date";
 
-export default function Comments({ comments }: { comments: CommentT[] }) {
+export default function Comments({
+  comments,
+}: {
+  comments: CommentT[] | undefined;
+}) {
   const [newComment, setNewComment] = useState("");
-  const [commentList, setCommentList] = useState(comments);
+  const [commentList, setCommentList] = useState(
+    comments ? comments : ([] as CommentT[])
+  );
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(e.target.value);
@@ -32,9 +38,16 @@ export default function Comments({ comments }: { comments: CommentT[] }) {
           <li key={index} className="list-group-item px-5">
             <div className="d-flex justify-content-between align-items-center">
               <small className="text-muted">{comment.user.username}</small>
-              <small className="text-muted">{formatDate(new Date())}</small>
+              <small className="text-muted">
+                {formatDate(new Date(comment.createdAt))}
+              </small>
             </div>
             <p className="m-0">{comment.content}</p>
+            <div className="d-flex justify-content-end">
+              <p className="card-text mb-0">
+                <small className="text-muted">Hearts: {comment.hearts}</small>
+              </p>
+            </div>
           </li>
         ))}
       </ul>

@@ -1,14 +1,28 @@
+// export function formatDate(date: Date): string {
+//   return (
+//     date.getFullYear() +
+//     "." +
+//     addZeroIfSingleDigit(date.getMonth() + 1) +
+//     "." +
+//     addZeroIfSingleDigit(date.getDate()) +
+//     " " +
+//     addZeroIfSingleDigit(date.getHours()) +
+//     ":" +
+//     addZeroIfSingleDigit(date.getMinutes())
+//   );
+// }
+
 export function formatDate(date: Date): string {
   return (
-    date.getFullYear() +
+    date.getHours() +
+    ":" +
+    addZeroIfSingleDigit(date.getMinutes()) +
+    " " +
+    addZeroIfSingleDigit(date.getDate()) +
     "." +
     addZeroIfSingleDigit(date.getMonth() + 1) +
     "." +
-    addZeroIfSingleDigit(date.getDate()) +
-    " " +
-    date.getHours() +
-    ":" +
-    date.getMinutes()
+    date.getFullYear()
   );
 }
 

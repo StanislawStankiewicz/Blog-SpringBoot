@@ -28,8 +28,6 @@ public class User {
 
     @Column(nullable = false)
     @JsonIgnore
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -49,23 +47,11 @@ public class User {
     @JsonIgnore
     private Set<Blogpost> blogposts;
 
+    @ManyToMany(mappedBy = "heartedByUsers", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Blogpost> heartedBlogposts;
+
     public User() {}
-
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-//    public boolean checkPassword(String rawPassword) {
-//        // Implement your password checking logic here.
-//        // This is a simple example. In real applications, use password hashing.
-//        return this.password.equals(rawPassword);
-//    }
 
     @Override
     public String toString() {

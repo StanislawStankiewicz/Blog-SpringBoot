@@ -6,5 +6,6 @@ export interface Comment {
   user: User;
   blogpost?: Blogpost;
   content: string;
-  created_at: string;
+  hearts: number;
+  createdAt: string;
 }

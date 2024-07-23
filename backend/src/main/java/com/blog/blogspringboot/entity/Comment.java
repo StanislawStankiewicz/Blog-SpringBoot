@@ -2,13 +2,16 @@ package com.blog.blogspringboot.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -28,19 +31,23 @@ public class Comment {
     @Column(columnDefinition = "TINYTEXT", nullable = false)
     private String content;
 
-    private int hearts;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    public Comment() {}
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "comment_hearts",
+            joinColumns = @JoinColumn(name = "comment_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> heartedByUsers;
 
-    public Comment(User user, Blogpost blogpost, String content, int hearts) {
-        this.user = user;
-        this.blogpost = blogpost;
-        this.content = content;
-        this.hearts = hearts;
+    @Transient
+    private int hearts;
+
+    public int getHearts() {
+        return heartedByUsers != null ? heartedByUsers.size() : 0;
     }
 
     @Override
@@ -48,7 +55,7 @@ public class Comment {
         return "Comment{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
-                ", hearts=" + hearts +
+                ", hearts=" + getHearts() +
                 ", createdAt=" + createdAt +
                 '}';
     }

@@ -2,6 +2,8 @@ package com.blog.blogspringboot.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "blogposts")
+@Builder
+@AllArgsConstructor
 public class Blogpost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +31,6 @@ public class Blogpost {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private int hearts;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -37,15 +39,28 @@ public class Blogpost {
     @OneToMany(mappedBy = "blogpost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "blogpost_hearts",
+            joinColumns = @JoinColumn(name = "blogpost_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> heartedByUsers;
+
+    @Transient
+    private int hearts;
+
     public Blogpost() {}
 
-    public Blogpost(User user, String title, String content, int hearts, Date createdAt, Set<Comment> comments) {
+    public Blogpost(User user, String title, String content, Date createdAt) {
         this.user = user;
         this.title = title;
         this.content = content;
-        this.hearts = hearts;
         this.createdAt = createdAt;
-        this.comments = comments;
+    }
+
+    public int getHearts() {
+        return heartedByUsers != null ? heartedByUsers.size() : 0;
     }
 
     @Override
@@ -54,7 +69,7 @@ public class Blogpost {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", hearts=" + hearts +
+                ", hearts=" + getHearts() +
                 ", createdAt=" + createdAt +
                 '}';
     }

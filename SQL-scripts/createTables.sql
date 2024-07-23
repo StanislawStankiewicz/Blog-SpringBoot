@@ -1,4 +1,6 @@
 -- Drop tables if they exist
+DROP TABLE IF EXISTS comment_hearts;
+DROP TABLE IF EXISTS blogpost_hearts;
 DROP TABLE IF EXISTS Comments;
 DROP TABLE IF EXISTS Blogposts;
 DROP TABLE IF EXISTS user_roles;
@@ -48,7 +50,6 @@ CREATE TABLE Blogposts (
     user_id INT,
     title VARCHAR(45),
     content TEXT,
-    hearts INT,
     created_at DATETIME,
     PRIMARY KEY (id),
     UNIQUE INDEX id_UNIQUE (id ASC),
@@ -66,7 +67,6 @@ CREATE TABLE Comments (
     user_id INT,
     blogpost_id INT,
     content TINYTEXT,
-    hearts INT,
     created_at DATETIME,
     PRIMARY KEY (id),
     UNIQUE INDEX id_UNIQUE (id ASC),
@@ -81,5 +81,39 @@ CREATE TABLE Comments (
         FOREIGN KEY (user_id)
         REFERENCES Users (id)
         ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+-- Create the blogpost_hearts table for many-to-many relationship between Blogposts and Users
+CREATE TABLE blogpost_hearts (
+    blogpost_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (blogpost_id, user_id),
+    CONSTRAINT fk_blogpost_hearts_blogposts
+        FOREIGN KEY (blogpost_id)
+        REFERENCES Blogposts (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT fk_blogpost_hearts_users
+        FOREIGN KEY (user_id)
+        REFERENCES Users (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+);
+
+-- Create the comment_hearts table for many-to-many relationship between Comments and Users
+CREATE TABLE comment_hearts (
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (comment_id, user_id),
+    CONSTRAINT fk_comment_hearts_comments
+        FOREIGN KEY (comment_id)
+        REFERENCES Comments (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    CONSTRAINT fk_comment_hearts_users
+        FOREIGN KEY (user_id)
+        REFERENCES Users (id)
+        ON DELETE CASCADE
         ON UPDATE NO ACTION
 );

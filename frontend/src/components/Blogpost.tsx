@@ -24,11 +24,9 @@ export default function Blogpost({ post }: { post: Blogpost }) {
           </p>
         </div>
       </div>
-      {post.comments && post.comments.length > 0 && (
-        <div className="card-footer p-0 overflow-hidden">
-          <Comments comments={post.comments} />
-        </div>
-      )}
+      <div className="card-footer p-0 overflow-hidden">
+        <Comments comments={post.comments} />
+      </div>
     </div>
   );
 }

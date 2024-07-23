@@ -1,5 +1,6 @@
 package com.blog.blogspringboot.controller;
 
+import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Collections;
 
 @RestController
@@ -45,5 +47,11 @@ public class CommentController {
                     .body(Collections.singletonMap("message", "No comment found with ID " + id));
         }
         return ResponseEntity.ok(comment);
+    }
+
+    @PostMapping
+    public ResponseEntity<Object> createComment(@RequestBody CommentRequestDTO comment, Principal principal) {
+        Comment createdComment = commentService.createComment(comment, principal.getName());
+        return ResponseEntity.ok(createdComment);
     }
 }

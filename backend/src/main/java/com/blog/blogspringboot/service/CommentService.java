@@ -1,24 +1,39 @@
 package com.blog.blogspringboot.service;
 
-import com.blog.blogspringboot.entity.Blogpost;
+import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.repository.CommentRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public CommentService(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-    }
+    private final UserService userService;
+
+    private final BlogpostService blogpostService;
 
     public Comment saveComment(Comment comment) {
+        return commentRepository.save(comment);
+    }
+
+    public Comment createComment(CommentRequestDTO commentRequestDTO, String username) {
+        Comment comment = Comment.builder()
+                .user(userService.getUserByUsername(username))
+                .blogpost(blogpostService.getBlogpostById(commentRequestDTO.getBlogpostId()))
+                .content(commentRequestDTO.getContent())
+                .createdAt(new Date())
+                .build();
+
         return commentRepository.save(comment);
     }
 

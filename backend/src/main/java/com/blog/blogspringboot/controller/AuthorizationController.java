@@ -4,6 +4,7 @@ import com.blog.blogspringboot.model.LoginRequest;
 import com.blog.blogspringboot.model.LoginResponse;
 import com.blog.blogspringboot.security.UserPrincipal;
 import com.blog.blogspringboot.security.jwt.JwtIssuer;
+import com.blog.blogspringboot.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,24 +23,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthorizationController {
 
-    private final JwtIssuer jwtIssuer;
-
-    private final AuthenticationManager authenticationManager;
+    private final AuthorizationService authorizationService;
 
     @PostMapping("/auth/login")
     public LoginResponse login(@RequestBody @Validated LoginRequest request) throws Exception {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        return authorizationService.attemptLogin(request.getUsername(), request.getPassword());
+    }
 
-        List<String> roles = principal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        String token = jwtIssuer.issue(principal.getUserId(), principal.getUsername(), roles);
-        return LoginResponse.builder()
-                .accessToken(token).build();
+    @PostMapping("/admin")
+    public String admin(Principal principal) {
+        return "Hello, " + principal.getName();
     }
 }
