@@ -2,9 +2,13 @@ package com.blog.blogspringboot.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -38,54 +42,6 @@ public class Comment {
         this.blogpost = blogpost;
         this.content = content;
         this.hearts = hearts;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Blogpost getBlogpost() {
-        return blogpost;
-    }
-
-    public void setBlogpost(Blogpost blogpost) {
-        this.blogpost = blogpost;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public int getHearts() {
-        return hearts;
-    }
-
-    public void setHearts(int hearts) {
-        this.hearts = hearts;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     @Override
