@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import heartFilled from "../assets/heart-filled.svg";
 import heartEmpty from "../assets/heart-empty.svg";
 import "./HeartButton.css"; // Make sure to import the CSS file where the .muted-icon class is defined
@@ -6,20 +6,48 @@ import "./HeartButton.css"; // Make sure to import the CSS file where the .muted
 interface HeartButtonProps {
   initialCount: number;
   size?: number;
+  token: string | null;
+  path: "comments" | "blogposts";
+  id: number;
+  locked?: boolean;
 }
 
 const HeartButton: React.FC<HeartButtonProps> = ({
   initialCount,
   size = 20,
+  token,
+  path,
+  id,
+  locked = false,
 }) => {
   const [count, setCount] = useState(initialCount);
   const [clicked, setClicked] = useState(false);
 
-  const handleClick = () => {
+  useEffect(() => {
+    if (locked) return;
+    fetchIsHearted(token!, path, id)
+      .then((res) => res.json())
+      .then((response) => {
+        if (response && response.isHearted !== clicked) {
+          setClicked(response.isHearted);
+        }
+      });
+  });
+
+  function handleClick() {
+    if (locked) return;
     setClicked(!clicked);
     setCount(clicked ? count - 1 : count + 1);
-    console.log(`Heart ${clicked ? "removed" : "added"}`);
-  };
+    fetchIsHearted(token!, path, id, "POST")
+      .then((res) => res.json())
+      .then(async (response) => {
+        console.log(response);
+        if (response.isHearted !== clicked) {
+          setCount(response.isHearted ? count + 1 : count - 1);
+          setClicked(response.isHearted);
+        }
+      });
+  }
 
   return (
     <div
@@ -41,3 +69,18 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 };
 
 export default HeartButton;
+
+function fetchIsHearted(
+  token: string,
+  path: string,
+  id: number,
+  method: "GET" | "POST" = "GET"
+) {
+  return fetch(`/api/${path}/${id}/heart`, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}

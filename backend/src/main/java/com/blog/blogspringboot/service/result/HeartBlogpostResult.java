@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public class HeartBlogpostResult {
     private boolean success;
 
-    private String message;
+    private Object message;
 
     private HttpStatus status;
 }

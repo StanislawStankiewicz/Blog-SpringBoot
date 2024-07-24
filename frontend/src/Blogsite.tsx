@@ -44,10 +44,14 @@ function Blogsite() {
       },
       body: JSON.stringify(loginRequest),
     }).then((res) => res.json());
+
     if (response.accessToken) {
       setUsername(username);
       setToken(response.accessToken);
       navigate("/");
+      return { success: true, message: "", accessToken: response.accessToken };
+    } else {
+      return { success: false, message: response.message, accessToken: null };
     }
   }
 
@@ -100,7 +104,7 @@ function Blogsite() {
                 transform: "translateX(-50%)",
               }}
             >
-              Blogsite
+              Blogsite DEMO
             </h1>
             <div style={{ width: "80px", visibility: "hidden" }}>Spacer</div>
           </div>

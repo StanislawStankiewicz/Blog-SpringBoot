@@ -4,6 +4,7 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.service.BlogpostService;
+import com.blog.blogspringboot.service.result.HeartBlogpostResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +55,14 @@ public class BlogpostController {
     }
 
     @PostMapping("/{id}/heart")
-    public ResponseEntity<Object> heartBlogpost(@PathVariable int id) {
-        
+    public ResponseEntity<Object> heartBlogpost(@PathVariable int id, Principal principal) {
+        HeartBlogpostResult result = blogpostService.heartBlogpost(id, principal.getName());
+        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    }
+
+    @GetMapping("/{id}/heart")
+    public ResponseEntity<Object> getHeartBlogpost(@PathVariable int id, Principal principal) {
+        HeartBlogpostResult result = blogpostService.getHeartBlogpost(id, principal.getName());
+        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
     }
 }

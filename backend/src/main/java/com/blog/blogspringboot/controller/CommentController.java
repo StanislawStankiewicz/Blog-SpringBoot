@@ -3,6 +3,7 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.service.CommentService;
+import com.blog.blogspringboot.service.result.HeartCommentResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public class CommentController {
     public Page<Comment> getAllComments(Pageable pageable,
                                           @RequestParam(required = false) Integer userId,
                                           @RequestParam(required = false) Integer blogpostId) {
-        // implement JpaSpecificationExecutor in the future
+        // TODO implement JpaSpecificationExecutor in the future
         if (userId != null && blogpostId != null) {
             return commentService.getAllCommentsByUserIdAndBlogpostId(userId, blogpostId, pageable);
         }
@@ -61,5 +62,17 @@ public class CommentController {
     public ResponseEntity<?> deleteComment(@PathVariable int id, Principal principal) {
         HttpStatus status = commentService.deleteComment(id, principal);
         return ResponseEntity.status(status).build();
+    }
+
+    @PostMapping("/{id}/heart")
+    public ResponseEntity<Object> heartComment(@PathVariable int id, Principal principal) {
+        HeartCommentResult result = commentService.heartComment(id, principal.getName());
+        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    }
+
+    @GetMapping("/{id}/heart")
+    public ResponseEntity<Object> getHeartComment(@PathVariable int id, Principal principal) {
+        HeartCommentResult result = commentService.getHeartComment(id, principal.getName());
+        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
     }
 }

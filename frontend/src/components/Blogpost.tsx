@@ -30,7 +30,13 @@ export default function Blogpost({
         </div>
         <p className="card-text mb-0">{post.content}</p>
         <div className="d-flex justify-content-end">
-          <HeartButton initialCount={post.hearts} />
+          <HeartButton
+            initialCount={post.hearts}
+            token={token}
+            path="blogposts"
+            id={id}
+            locked={!username}
+          />
         </div>
       </div>
       <div className="card-footer p-0 overflow-hidden">

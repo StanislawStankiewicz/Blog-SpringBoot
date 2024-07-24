@@ -7,19 +7,13 @@ import com.blog.blogspringboot.model.RegisterResponse;
 import com.blog.blogspringboot.service.AuthorizationService;
 import com.blog.blogspringboot.service.UserService;
 import com.blog.blogspringboot.service.result.RegistrationResult;
-import com.blog.blogspringboot.util.UserUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.http.HttpResponse;
-import java.security.Principal;
-import java.util.Collections;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,23 +24,31 @@ public class AuthorizationController {
     private final UserService userService;
 
     @PostMapping("/auth/login")
-    public LoginResponse login(@RequestBody @Validated LoginRequest request) {
+    public ResponseEntity<Object> login(@RequestBody @Validated LoginRequest request) {
         // TODO refactor like register
-        return authorizationService.attemptLogin(request.getUsername(), request.getPassword());
+        System.out.println("login request: " + request);
+        LoginResponse result = authorizationService.attemptLogin(request.getUsername(), request.getPassword());
+
+        return ResponseEntity
+                .status(result.getStatus())
+                .body(result);
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<?> register(@RequestBody @Validated RegisterRequest request) {
+    public ResponseEntity<Object> register(@RequestBody @Validated RegisterRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
         String email = request.getEmail();
 
-        RegistrationResult result = authorizationService.attemptRegister(username, password, email);
-        return ResponseEntity.status(result.getStatus()).body(result);
+        RegisterResponse result = authorizationService.attemptRegister(username, password, email);
+
+        return ResponseEntity
+                .status(result.getStatus())
+                .body(result);
     }
 
-    @PostMapping("/admin")
-    public String admin(Principal principal) {
-        return "Hello, " + principal.getName();
+    @DeleteMapping("/auth/db")
+    public ResponseEntity<Object> restartDatabase() {
+
     }
 }

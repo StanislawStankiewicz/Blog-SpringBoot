@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Comment as CommentT } from "../types/Comment.type";
 import { formatDate } from "../utils/date";
-import { User } from "../types/User.type";
 import HeartButton from "./HeartButton";
 import "./HeartButton.css"; // Make sure to import the CSS file where the .muted-icon class is defined
 
@@ -34,19 +33,6 @@ export default function Comments({
       return;
     }
 
-    // fake visual feedback
-    const newCommentObject: CommentT = {
-      id: commentList.length + 1,
-      user: new User(0, username),
-      content: newComment,
-      createdAt: new Date().toISOString(),
-      hearts: 0,
-    };
-
-    setCommentList([...commentList, newCommentObject]);
-    setNewComment("");
-
-    // POST request
     const commentRequest = {
       blogpostId,
       content: newComment,
@@ -62,7 +48,8 @@ export default function Comments({
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        console.log("Success:", data);
+        setCommentList([...commentList, data]);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -83,7 +70,14 @@ export default function Comments({
             </div>
             <p className="m-0">{comment.content}</p>
             <div className="d-flex justify-content-end">
-              <HeartButton initialCount={comment.hearts} size={16} />
+              <HeartButton
+                initialCount={comment.hearts}
+                size={16}
+                token={token}
+                path="comments"
+                id={comment.id}
+                locked={!username}
+              />
             </div>
           </li>
         ))}

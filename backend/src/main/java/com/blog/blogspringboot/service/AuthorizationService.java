@@ -3,6 +3,7 @@ package com.blog.blogspringboot.service;
 import com.blog.blogspringboot.entity.Role;
 import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.model.LoginResponse;
+import com.blog.blogspringboot.model.RegisterResponse;
 import com.blog.blogspringboot.security.UserPrincipal;
 import com.blog.blogspringboot.security.jwt.JwtIssuer;
 import com.blog.blogspringboot.service.result.RegistrationResult;
@@ -33,9 +34,18 @@ public class AuthorizationService {
     private final UserService userService;
 
     public LoginResponse attemptLogin(String username, String password) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+        } catch (Exception e) {
+            return LoginResponse.builder()
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .success(false)
+                    .message("Invalid username or password.")
+                    .build();
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 
@@ -45,21 +55,26 @@ public class AuthorizationService {
 
         String token = jwtIssuer.issue(principal.getUserId(), principal.getUsername(), roles);
         return LoginResponse.builder()
+                .status(HttpStatus.OK)
+                .success(true)
+                .message("Login successful.")
                 .accessToken(token).build();
     }
 
-    public RegistrationResult attemptRegister(String username, String password, String email) {
+    public RegisterResponse attemptRegister(String username, String password, String email) {
         if (userService.getUserByUsername(username) != null) {
-            return new RegistrationResult(
-                    false,
-                    "This user already exists.",
-                    HttpStatus.CONFLICT);
+            return RegisterResponse.builder()
+                    .status(HttpStatus.CONFLICT)
+                    .success(false)
+                    .message("Username already exists.")
+                    .build();
         }
         if (!UserUtils.validatePassword()) {
-            return new RegistrationResult(
-                    false,
-                    "Invalid password.",
-                    HttpStatus.BAD_REQUEST);
+            return RegisterResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .success(false)
+                    .message("Password must be at least 8 characters long.")
+                    .build();
         }
         String hashed_password = new BCryptPasswordEncoder().encode(password);
         User user = User.builder()
@@ -69,7 +84,10 @@ public class AuthorizationService {
                 .build();
         // TODO roles should be enums
         user.assignRole(new Role(1, "ROLE_USER"));
-        user = userService.saveUser(user);
-        return new RegistrationResult(true, JsonUtil.toJson(user), HttpStatus.CREATED);
+        userService.saveUser(user);
+        return RegisterResponse.builder()
+                .status(HttpStatus.CREATED)
+                .success(true)
+                .build();
     }
 }
