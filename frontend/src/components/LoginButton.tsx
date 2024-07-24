@@ -1,17 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
-export default function LoginButton({
-  username,
-  onLogout,
-}: {
-  username: string | null;
-  onLogout: () => void;
-}) {
+export default function LoginButton({ username, onLogout }) {
   const navigate = useNavigate();
 
   return username ? (
     <button type="button" className="btn btn-primary" onClick={onLogout}>
-      Log out
+      Log off
     </button>
   ) : (
     <button

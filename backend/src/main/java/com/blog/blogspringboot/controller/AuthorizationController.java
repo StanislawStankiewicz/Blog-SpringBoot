@@ -31,6 +31,7 @@ public class AuthorizationController {
 
     @PostMapping("/auth/login")
     public LoginResponse login(@RequestBody @Validated LoginRequest request) {
+        // TODO refactor like register
         return authorizationService.attemptLogin(request.getUsername(), request.getPassword());
     }
 

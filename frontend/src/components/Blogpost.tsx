@@ -1,6 +1,7 @@
 import type { Blogpost } from "../types/Blogpost.type";
 import { formatDate } from "../utils/date";
 import Comments from "./Comments";
+import HeartButton from "./HeartButton";
 
 export default function Blogpost({
   post,
@@ -29,9 +30,7 @@ export default function Blogpost({
         </div>
         <p className="card-text mb-0">{post.content}</p>
         <div className="d-flex justify-content-end">
-          <p className="card-text mb-0">
-            <small className="text-muted">Hearts: {post.hearts}</small>
-          </p>
+          <HeartButton initialCount={post.hearts} />
         </div>
       </div>
       <div className="card-footer p-0 overflow-hidden">

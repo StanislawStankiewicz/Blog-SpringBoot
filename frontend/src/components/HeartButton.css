@@ -1,0 +1,9 @@
+.muted-text {
+  color: #6c757d; /* Bootstrap's .text-muted color */
+}
+
+.muted-icon {
+  filter: invert(62%) sepia(6%) saturate(272%) hue-rotate(175deg)
+    brightness(91%) contrast(86%);
+  translate: 0 10%;
+}

@@ -52,4 +52,9 @@ public class BlogpostController {
         HttpStatus status = blogpostService.deleteBlogpost(id, principal);
         return ResponseEntity.status(status).build();
     }
+
+    @PostMapping("/{id}/heart")
+    public ResponseEntity<Object> heartBlogpost(@PathVariable int id) {
+        
+    }
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Comment as CommentT } from "../types/Comment.type";
 import { formatDate } from "../utils/date";
 import { User } from "../types/User.type";
+import HeartButton from "./HeartButton";
+import "./HeartButton.css"; // Make sure to import the CSS file where the .muted-icon class is defined
 
 export default function Comments({
   comments,
@@ -81,9 +83,7 @@ export default function Comments({
             </div>
             <p className="m-0">{comment.content}</p>
             <div className="d-flex justify-content-end">
-              <p className="card-text mb-0">
-                <small className="text-muted">Hearts: {comment.hearts}</small>
-              </p>
+              <HeartButton initialCount={comment.hearts} size={16} />
             </div>
           </li>
         ))}
