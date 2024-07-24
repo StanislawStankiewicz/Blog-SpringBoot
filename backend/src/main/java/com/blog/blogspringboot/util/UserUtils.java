@@ -14,4 +14,8 @@ public class UserUtils {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
+
+    public static boolean validatePassword() {
+        return true;
+    }
 }

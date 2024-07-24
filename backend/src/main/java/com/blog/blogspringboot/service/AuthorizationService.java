@@ -1,16 +1,25 @@
 package com.blog.blogspringboot.service;
 
+import com.blog.blogspringboot.entity.Role;
+import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.model.LoginResponse;
 import com.blog.blogspringboot.security.UserPrincipal;
 import com.blog.blogspringboot.security.jwt.JwtIssuer;
+import com.blog.blogspringboot.service.result.RegistrationResult;
+import com.blog.blogspringboot.util.JsonUtil;
+import com.blog.blogspringboot.util.UserUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,6 +29,8 @@ public class AuthorizationService {
     private final JwtIssuer jwtIssuer;
 
     private final AuthenticationManager authenticationManager;
+
+    private final UserService userService;
 
     public LoginResponse attemptLogin(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
@@ -35,5 +46,30 @@ public class AuthorizationService {
         String token = jwtIssuer.issue(principal.getUserId(), principal.getUsername(), roles);
         return LoginResponse.builder()
                 .accessToken(token).build();
+    }
+
+    public RegistrationResult attemptRegister(String username, String password, String email) {
+        if (userService.getUserByUsername(username) != null) {
+            return new RegistrationResult(
+                    false,
+                    "This user already exists.",
+                    HttpStatus.CONFLICT);
+        }
+        if (!UserUtils.validatePassword()) {
+            return new RegistrationResult(
+                    false,
+                    "Invalid password.",
+                    HttpStatus.BAD_REQUEST);
+        }
+        String hashed_password = new BCryptPasswordEncoder().encode(password);
+        User user = User.builder()
+                .username(username)
+                .password(hashed_password)
+                .email(email)
+                .build();
+        // TODO roles should be enums
+        user.assignRole(new Role(1, "ROLE_USER"));
+        user = userService.saveUser(user);
+        return new RegistrationResult(true, JsonUtil.toJson(user), HttpStatus.CREATED);
     }
 }
