@@ -4,24 +4,27 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.service.BlogpostService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Collections;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/blogposts")
 public class BlogpostController {
 
     private final BlogpostService blogpostService;
 
-    @Autowired
-    public BlogpostController(BlogpostService blogpostService) {
-        this.blogpostService = blogpostService;
+    @PostMapping
+    public ResponseEntity<Object> createBlogpost(Principal principal, @RequestBody BlogpostRequestDTO blogpost) {
+        Blogpost createdBlogpost = blogpostService.createBlogpost(blogpost, principal.getName());
+        return ResponseEntity.ok(createdBlogpost);
     }
 
     @GetMapping
@@ -33,12 +36,6 @@ public class BlogpostController {
         return blogpostService.getAllBlogposts(pageable);
     }
 
-    @PostMapping
-    public ResponseEntity<Object> createBlogpost(Principal principal, @RequestBody BlogpostRequestDTO blogpost) {
-        Blogpost createdBlogpost = blogpostService.createBlogpost(blogpost, principal.getName());
-        return ResponseEntity.ok(createdBlogpost);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Object> getBlogpostById(@PathVariable int id) {
         Blogpost blogpost = blogpostService.getBlogpostById(id);
@@ -48,5 +45,11 @@ public class BlogpostController {
                     .body(Collections.singletonMap("message", "No blogpost found with ID " + id));
         }
         return ResponseEntity.ok(blogpost);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBlogpost(@PathVariable int id, Principal principal) {
+        HttpStatus status = blogpostService.deleteBlogpost(id, principal);
+        return ResponseEntity.status(status).build();
     }
 }

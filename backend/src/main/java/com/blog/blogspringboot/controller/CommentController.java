@@ -6,6 +6,7 @@ import com.blog.blogspringboot.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,11 @@ public class CommentController {
     public Page<Comment> getAllComments(Pageable pageable,
                                           @RequestParam(required = false) Integer userId,
                                           @RequestParam(required = false) Integer blogpostId) {
+        // implement JpaSpecificationExecutor in the future
         if (userId != null && blogpostId != null) {
             return commentService.getAllCommentsByUserIdAndBlogpostId(userId, blogpostId, pageable);
         }
-        if (blogpostId != null) {
+        if (blogpostId != null ) {
             return commentService.getAllCommentsByBlogpostId(blogpostId, pageable);
         }
         if (userId != null) {
@@ -53,5 +55,11 @@ public class CommentController {
     public ResponseEntity<Object> createComment(@RequestBody CommentRequestDTO comment, Principal principal) {
         Comment createdComment = commentService.createComment(comment, principal.getName());
         return ResponseEntity.ok(createdComment);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteComment(@PathVariable int id, Principal principal) {
+        HttpStatus status = commentService.deleteComment(id, principal);
+        return ResponseEntity.status(status).build();
     }
 }

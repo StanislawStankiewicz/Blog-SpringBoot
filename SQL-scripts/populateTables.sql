@@ -1,14 +1,14 @@
 -- Insert data into Users table
 INSERT INTO Users (username, email, password, created_at) VALUES
-    ('john_doe', 'john@example.com', '123', NOW()),
-    ('jane_smith', 'jane@example.com', '123', NOW()),
-    ('alice_jones', 'alice@example.com', '123', NOW());
+    ('john_doe', 'john@example.com', '$2a$12$WFGAz6dXTUjGs.0dGHZL9udHj3wUSIILtFYsUQ9vH1oLdAjP4xPeq', NOW()),
+    ('jane_smith', 'jane@example.com', '$2a$12$WFGAz6dXTUjGs.0dGHZL9udHj3wUSIILtFYsUQ9vH1oLdAjP4xPeq', NOW()),
+    ('alice_jones', 'alice@example.com', '$2a$12$WFGAz6dXTUjGs.0dGHZL9udHj3wUSIILtFYsUQ9vH1oLdAjP4xPeq', NOW());
 
 -- Insert data into Roles table
 INSERT INTO Roles (name) VALUES
-    ('ROLE_ADMIN'),
-    ('ROLE_EDITOR'),
-    ('ROLE_USER');
+    ('ROLE_USER'),
+    ('ROLE_MODERATOR'),
+    ('ROLE_ADMIN');
 
 -- Insert data into user_roles table
 INSERT INTO user_roles (user_id, role_id) VALUES

@@ -4,15 +4,16 @@ import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.repository.BlogpostRepository;
+import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Date;
-import java.util.HashSet;
 
 @Service
 @Transactional
@@ -44,8 +45,20 @@ public class BlogpostService {
         return blogpostRepository.findAll(pageable);
     }
 
-    public void deleteBlogpost(int id) {
-        blogpostRepository.deleteById(id);
+    public HttpStatus deleteBlogpost(int id, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
+        Blogpost blogpost = getBlogpostById(id);
+        if (blogpost == null) {
+            return HttpStatus.NOT_FOUND;
+        }
+        System.out.println(user.getRoles());
+        boolean isModerator = UserUtils.isUserAdmin();
+        boolean isAuthor = blogpost.getUser().equals(user);
+        if (isModerator || isAuthor) {
+            blogpostRepository.deleteById(id);
+            return HttpStatus.NO_CONTENT;
+        }
+        return HttpStatus.FORBIDDEN;
     }
 
     public Page<Blogpost> getAllBlogpostsByUserId(Integer userId, Pageable pageable) {
