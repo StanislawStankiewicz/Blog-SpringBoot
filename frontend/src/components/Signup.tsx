@@ -6,6 +6,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -15,6 +16,7 @@ function Signup() {
       setPassword("");
       return;
     }
+
     const signupRequest = {
       username,
       password,
@@ -31,9 +33,10 @@ function Signup() {
 
     if (!response.success) {
       setErrorMessage(response.message);
+      setSuccessMessage(null);
     } else {
       setErrorMessage(null);
-      alert("Signup successful! Please log in.");
+      setSuccessMessage("User succefssfully created.");
     }
   }
 
@@ -46,6 +49,7 @@ function Signup() {
         />
         <h2>Sign Up</h2>
         {errorMessage && <InfoCard message={errorMessage} type="error" />}
+        {successMessage && <InfoCard message={successMessage} type="success" />}
         <form onSubmit={handleSignup}>
           <div className="mb-3">
             <label className="form-label">Username</label>

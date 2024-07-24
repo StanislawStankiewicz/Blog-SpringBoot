@@ -6,12 +6,9 @@ import com.blog.blogspringboot.model.LoginResponse;
 import com.blog.blogspringboot.model.RegisterResponse;
 import com.blog.blogspringboot.security.UserPrincipal;
 import com.blog.blogspringboot.security.jwt.JwtIssuer;
-import com.blog.blogspringboot.service.result.RegistrationResult;
-import com.blog.blogspringboot.util.JsonUtil;
 import com.blog.blogspringboot.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service

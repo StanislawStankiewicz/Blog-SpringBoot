@@ -16,6 +16,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/auth/, ""),
       },
+      "/nuke": {
+        target: "http://localhost:8080/nuke", // The backend server URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/nuke/, ""),
+      },
     },
   },
 });

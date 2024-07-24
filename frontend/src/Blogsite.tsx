@@ -6,7 +6,9 @@ import Blogposts from "./components/Blogposts";
 import { Blogpost as BlogpostT } from "./types/Blogpost.type";
 import LoginButton from "./components/LoginButton";
 import CreateBlogForm from "./components/CreateBlogForm";
+import RestartDatabaseButton from "./components/RestartDatabaseButton";
 import "./Blogsite.css";
+import InfoCard from "./components/InfoCard";
 
 function Blogsite() {
   const [username, setUsername] = useState<string | null>(null);
@@ -31,7 +33,14 @@ function Blogsite() {
     fetchBlogposts();
   }, []);
 
-  async function handleLogin(username: string, password: string) {
+  async function handleLogin(
+    username: string,
+    password: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    accessToken: string | null;
+  }> {
     const loginRequest = {
       username,
       password,
@@ -109,7 +118,16 @@ function Blogsite() {
             <div style={{ width: "80px", visibility: "hidden" }}>Spacer</div>
           </div>
 
-          <div className="text-center my-3">
+          <div className="d-flex justify-content-center my-3">
+            <div style={{ width: "600px" }}>
+              <InfoCard
+                message="This is a demo version. Any user that successfuly logs in (which is not hard) can add content. If you feel like any of the content here is inappropriate or offensive, feel free to log in, and restart the database, using the button at the bottom of the page."
+                type="info"
+              />
+            </div>
+          </div>
+
+          <div className="text-center mb-3">
             <button
               className="btn btn-success"
               onClick={toggleCreateForm}
@@ -141,6 +159,7 @@ function Blogsite() {
               }
             />
           </Routes>
+          <RestartDatabaseButton token={token} />
         </div>
       </div>
     </div>

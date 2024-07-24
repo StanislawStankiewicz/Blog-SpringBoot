@@ -1,6 +1,5 @@
 package com.blog.blogspringboot.util;
 
-import com.blog.blogspringboot.aspect.LoggingAspect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.logging.Log;

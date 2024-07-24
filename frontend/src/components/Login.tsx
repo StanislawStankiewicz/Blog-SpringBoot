@@ -42,7 +42,7 @@ const Login: React.FC<Props> = ({ onLogin }) => {
           message="This is a demo version. Because of that, the password length is limited to 4 characters. Do not use your real password since the connection is not secure."
           type="info"
         />
-        <div className=" d-flex justify-content-center align-items-center">
+        <div className="d-flex justify-content-center align-items-center">
           <h2 className="mb-0">Login</h2>
         </div>
         {errorMessage && <InfoCard message={errorMessage} type="error" />}

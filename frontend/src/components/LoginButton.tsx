@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-export default function LoginButton({ username, onLogout }) {
+export default function LoginButton({
+  username,
+  onLogout,
+}: {
+  username: string | null;
+  onLogout: () => void;
+}) {
   const navigate = useNavigate();
 
   return username ? (
