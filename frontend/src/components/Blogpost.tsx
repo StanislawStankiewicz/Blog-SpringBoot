@@ -2,7 +2,17 @@ import type { Blogpost } from "../types/Blogpost.type";
 import { formatDate } from "../utils/date";
 import Comments from "./Comments";
 
-export default function Blogpost({ post }: { post: Blogpost }) {
+export default function Blogpost({
+  post,
+  username,
+  token,
+  id,
+}: {
+  post: Blogpost;
+  username: string | null;
+  token: string | null;
+  id: number;
+}) {
   return (
     <div key={post.id} className="card mt-3">
       <div className="card-body">
@@ -25,7 +35,12 @@ export default function Blogpost({ post }: { post: Blogpost }) {
         </div>
       </div>
       <div className="card-footer p-0 overflow-hidden">
-        <Comments comments={post.comments} />
+        <Comments
+          comments={post.comments}
+          username={username}
+          token={token}
+          blogpostId={id}
+        />
       </div>
     </div>
   );

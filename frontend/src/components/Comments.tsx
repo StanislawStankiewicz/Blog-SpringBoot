@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { Comment as CommentT } from "../types/Comment.type";
 import { formatDate } from "../utils/date";
+import { User } from "../types/User.type";
 
 export default function Comments({
   comments,
+  username,
+  token,
+  blogpostId,
 }: {
   comments: CommentT[] | undefined;
+  username: string | null;
+  token: string | null;
+  blogpostId: number;
 }) {
   const [newComment, setNewComment] = useState("");
   const [commentList, setCommentList] = useState(
@@ -20,14 +27,44 @@ export default function Comments({
     e.preventDefault();
     if (newComment.trim() === "") return;
 
+    if (!username) {
+      console.error("You are not logged in.");
+      return;
+    }
+
+    // fake visual feedback
     const newCommentObject: CommentT = {
-      user: { username: "current_user" }, // Replace with the actual current user
+      id: commentList.length + 1,
+      user: new User(0, username),
       content: newComment,
       createdAt: new Date().toISOString(),
+      hearts: 0,
     };
 
     setCommentList([...commentList, newCommentObject]);
     setNewComment("");
+
+    // POST request
+    const commentRequest = {
+      blogpostId,
+      content: newComment,
+    };
+
+    fetch(`/api/comments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(commentRequest),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   return (
@@ -59,8 +96,13 @@ export default function Comments({
             placeholder="Add a comment..."
             value={newComment}
             onChange={handleCommentChange}
+            disabled={!username}
           />
-          <button className="btn btn-primary" type="submit">
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={!username}
+          >
             Submit
           </button>
         </div>
