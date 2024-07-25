@@ -118,44 +118,48 @@ function Blogsite() {
             <div style={{ width: "80px", visibility: "hidden" }}>Spacer</div>
           </div>
 
-          <div className="d-flex justify-content-center my-3">
-            <div style={{ width: "600px" }}>
-              <InfoCard
-                message="This is a demo version. Any user that successfuly logs in (which is not hard) can add content. If you feel like any of the content here is inappropriate or offensive, feel free to log in, and restart the database, using the button at the bottom of the page."
-                type="info"
-              />
-            </div>
-          </div>
-
-          <div className="text-center mb-3">
-            <button
-              className="btn btn-success"
-              onClick={toggleCreateForm}
-              disabled={!username}
-            >
-              {showCreateForm ? "Cancel" : "Create a Blog"}
-            </button>
-          </div>
-          {showCreateForm && (
-            <div
-              className={slideIn ? "slide-enter-active" : "slide-exit-active"}
-            >
-              <CreateBlogForm
-                token={token}
-                onPostCreated={(post) => {
-                  setPosts([...posts, post]);
-                  toggleCreateForm();
-                }}
-              />
-            </div>
-          )}
           <Routes>
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/signup" element={<Signup />} />
             <Route
               path="/"
               element={
-                <Blogposts posts={posts} username={username} token={token} />
+                <>
+                  <div className="d-flex justify-content-center my-3">
+                    <div style={{ width: "600px" }}>
+                      <InfoCard
+                        message="This is a demo version. Any user that successfuly logs in (which is not hard) can add content. If you feel like any of the content here is inappropriate or offensive, feel free to log in, and restart the database, using the button at the bottom of the page."
+                        type="info"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-3">
+                    <button
+                      className="btn btn-success"
+                      onClick={toggleCreateForm}
+                      disabled={!username}
+                    >
+                      {showCreateForm ? "Cancel" : "Create a Blog"}
+                    </button>
+                  </div>
+                  {showCreateForm && (
+                    <div
+                      className={
+                        slideIn ? "slide-enter-active" : "slide-exit-active"
+                      }
+                    >
+                      <CreateBlogForm
+                        token={token}
+                        onPostCreated={(post) => {
+                          setPosts([...posts, post]);
+                          toggleCreateForm();
+                        }}
+                      />
+                    </div>
+                  )}
+                  <Blogposts posts={posts} username={username} token={token} />
+                </>
               }
             />
           </Routes>

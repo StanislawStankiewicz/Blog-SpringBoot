@@ -35,11 +35,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sMng -> sMng.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
-                .securityMatcher("/**")
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/blogposts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/blogposts").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/vite.svg",
+                                "/assets/**"
+                        ).permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
