@@ -65,6 +65,13 @@ public class AuthorizationService {
                     .message("Username already exists.")
                     .build();
         }
+        if (userService.userExistsByEmail(email)) {
+            return RegisterResponse.builder()
+                    .status(HttpStatus.CONFLICT)
+                    .success(false)
+                    .message("Email already exists.")
+                    .build();
+        }
         if (!UserUtils.validatePassword()) {
             return RegisterResponse.builder()
                     .status(HttpStatus.BAD_REQUEST)
@@ -72,10 +79,10 @@ public class AuthorizationService {
                     .message("Password must be at least 8 characters long.")
                     .build();
         }
-        String hashed_password = new BCryptPasswordEncoder().encode(password);
+        String hashedPassword = new BCryptPasswordEncoder().encode(password);
         User user = User.builder()
                 .username(username)
-                .password(hashed_password)
+                .password(hashedPassword)
                 .email(email)
                 .build();
         // TODO roles should be enums
@@ -83,6 +90,7 @@ public class AuthorizationService {
         userService.saveUser(user);
         return RegisterResponse.builder()
                 .status(HttpStatus.CREATED)
+                .message("User registered successfully.")
                 .success(true)
                 .build();
     }

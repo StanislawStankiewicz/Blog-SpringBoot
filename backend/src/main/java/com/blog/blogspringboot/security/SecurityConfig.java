@@ -45,6 +45,8 @@ public class SecurityConfig {
                                 "/vite.svg",
                                 "/assets/**"
                         ).permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
