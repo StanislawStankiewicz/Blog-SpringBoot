@@ -16,15 +16,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthorizationController {
 
     private final AuthorizationService authorizationService;
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     @Operation(summary = "Login with username and password")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful login",
@@ -80,7 +82,7 @@ public class AuthorizationController {
                                     })
                     })
     })
-    @PostMapping("/auth/register")
+    @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody @Validated RegisterRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();

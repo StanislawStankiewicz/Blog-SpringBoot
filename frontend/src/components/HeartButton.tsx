@@ -25,26 +25,25 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 
   useEffect(() => {
     if (locked) return;
-    fetchIsHearted(token!, path, id)
+    fetchHearted(token!, path, id)
       .then((res) => res.json())
       .then((response) => {
-        if (response && response.isHearted !== clicked) {
-          setClicked(response.isHearted);
+        if (response && response.hearted !== clicked) {
+          setClicked(response.hearted);
         }
       });
-  });
+  }, []);
 
   function handleClick() {
     if (locked) return;
     setClicked(!clicked);
     setCount(clicked ? count - 1 : count + 1);
-    fetchIsHearted(token!, path, id, "POST")
+    fetchHearted(token!, path, id, "POST")
       .then((res) => res.json())
       .then(async (response) => {
-        console.log(response);
-        if (response.isHearted !== clicked) {
-          setCount(response.isHearted ? count + 1 : count - 1);
-          setClicked(response.isHearted);
+        if (response.hearted !== clicked) {
+          setCount(response.hearted ? count + 1 : count - 1);
+          setClicked(response.hearted);
         }
       });
   }
@@ -70,7 +69,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 
 export default HeartButton;
 
-function fetchIsHearted(
+function fetchHearted(
   token: string,
   path: string,
   id: number,

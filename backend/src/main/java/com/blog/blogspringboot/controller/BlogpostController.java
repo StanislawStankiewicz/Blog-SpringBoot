@@ -4,7 +4,7 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.service.BlogpostService;
-import com.blog.blogspringboot.service.result.HeartBlogpostResult;
+import com.blog.blogspringboot.model.HeartBlogpostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,20 +49,18 @@ public class BlogpostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBlogpost(@PathVariable int id, Principal principal) {
+    public ResponseEntity<Object> deleteBlogpost(@PathVariable int id, Principal principal) {
         HttpStatus status = blogpostService.deleteBlogpost(id, principal);
         return ResponseEntity.status(status).build();
     }
 
     @PostMapping("/{id}/heart")
-    public ResponseEntity<Object> heartBlogpost(@PathVariable int id, Principal principal) {
-        HeartBlogpostResult result = blogpostService.heartBlogpost(id, principal.getName());
-        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    public HeartBlogpostResponse heartBlogpost(@PathVariable int id, Principal principal) {
+        return blogpostService.heartBlogpost(id, principal.getName());
     }
 
     @GetMapping("/{id}/heart")
-    public ResponseEntity<Object> getHeartBlogpost(@PathVariable int id, Principal principal) {
-        HeartBlogpostResult result = blogpostService.getHeartBlogpost(id, principal.getName());
-        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    public HeartBlogpostResponse getHeartBlogpost(@PathVariable int id, Principal principal) {
+        return blogpostService.getHeartBlogpost(id, principal.getName());
     }
 }

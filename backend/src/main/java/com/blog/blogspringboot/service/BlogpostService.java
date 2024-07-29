@@ -4,7 +4,7 @@ import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.repository.BlogpostRepository;
-import com.blog.blogspringboot.service.result.HeartBlogpostResult;
+import com.blog.blogspringboot.model.HeartBlogpostResponse;
 import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Date;
 
 @Service
@@ -53,7 +52,6 @@ public class BlogpostService {
         if (blogpost == null) {
             return HttpStatus.NOT_FOUND;
         }
-        System.out.println(user.getRoles());
         boolean isModerator = UserUtils.isUserAdmin();
         boolean isAuthor = blogpost.getUser().equals(user);
         if (isModerator || isAuthor) {
@@ -67,38 +65,66 @@ public class BlogpostService {
         return blogpostRepository.findAllByUserId(userId, pageable);
     }
 
-    public HeartBlogpostResult heartBlogpost(int id, String name) {
+    public HeartBlogpostResponse heartBlogpost(int id, String name) {
         User user = userService.getUserByUsername(name);
         if (user == null) {
-            return new HeartBlogpostResult(false, "User not found", HttpStatus.NOT_FOUND);
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
         }
+
         Blogpost blogpost = getBlogpostById(id);
         if (blogpost == null) {
-            return new HeartBlogpostResult(false, "No blogpost found with ID " + id, HttpStatus.NOT_FOUND);
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Blogpost not found");
         }
+
+        boolean wasHearted = toggleHeartStatus(blogpost, user);
+        blogpostRepository.save(blogpost);
+
+        return createSuccessResponse(!wasHearted);
+    }
+
+    public HeartBlogpostResponse getHeartBlogpost(int id, String name) {
+        User user = userService.getUserByUsername(name);
+        if (user == null) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        Blogpost blogpost = getBlogpostById(id);
+        if (blogpost == null) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Blogpost not found");
+        }
+
+        boolean hearted = isBlogpostHeartedByUser(blogpost, user);
+        return createSuccessResponse(hearted);
+    }
+
+    private HeartBlogpostResponse createErrorResponse(HttpStatus status, String message) {
+        return HeartBlogpostResponse.builder()
+                .status(status)
+                .success(false)
+                .message(message)
+                .hearted(false)
+                .build();
+    }
+
+    private HeartBlogpostResponse createSuccessResponse(boolean hearted) {
+        return HeartBlogpostResponse.builder()
+                .status(HttpStatus.OK)
+                .success(true)
+                .hearted(hearted)
+                .build();
+    }
+
+    private boolean toggleHeartStatus(Blogpost blogpost, User user) {
         boolean wasHearted = blogpost.getHeartedByUsers().contains(user);
         if (wasHearted) {
             blogpost.getHeartedByUsers().remove(user);
         } else {
             blogpost.getHeartedByUsers().add(user);
         }
-        blogpostRepository.save(blogpost);
-        // return not-wasHearted because we want to return the current state
-        return new HeartBlogpostResult(true, Collections.singletonMap("isHearted", !wasHearted), HttpStatus.OK);
+        return wasHearted;
     }
 
-    public HeartBlogpostResult getHeartBlogpost(int id, String name) {
-        User user = userService.getUserByUsername(name);
-        if (user == null) {
-            return new HeartBlogpostResult(false, "User not found", HttpStatus.NOT_FOUND);
-        }
-        Blogpost blogpost = getBlogpostById(id);
-        if (blogpost == null) {
-            return new HeartBlogpostResult(false, "No blogpost found with ID " + id, HttpStatus.NOT_FOUND);
-        }
-        if (blogpost.getHeartedByUsers().contains(user)) {
-            return new HeartBlogpostResult(true, Collections.singletonMap("isHearted", true), HttpStatus.OK);
-        }
-        return new HeartBlogpostResult(true, Collections.singletonMap("isHearted", false), HttpStatus.OK);
+    private boolean isBlogpostHeartedByUser(Blogpost blogpost, User user) {
+        return blogpost.getHeartedByUsers().contains(user);
     }
 }

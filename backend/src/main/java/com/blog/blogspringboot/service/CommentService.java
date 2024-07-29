@@ -4,7 +4,7 @@ import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.repository.CommentRepository;
-import com.blog.blogspringboot.service.result.HeartCommentResult;
+import com.blog.blogspringboot.model.HeartCommentResponse;
 import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Date;
 
 @Service
@@ -78,37 +77,64 @@ public class CommentService {
         return commentRepository.findByUserIdAndBlogpostId(userId, blogpostId, pageable);
     }
 
-    public HeartCommentResult heartComment(int id, String username) {
+    public HeartCommentResponse heartComment(int id, String username) {
         User user = userService.getUserByUsername(username);
         if (user == null) {
-            return new HeartCommentResult(false, "User not found", HttpStatus.NOT_FOUND);
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
         }
+
         Comment comment = getCommentById(id);
         if (comment == null) {
-            return new HeartCommentResult(false, "No comment found with ID " + id, HttpStatus.NOT_FOUND);
-                }
+            return createErrorResponse(HttpStatus.NOT_FOUND, "No comment found with ID " + id);
+        }
+
+        boolean wasHearted = toggleHeartStatus(comment, user);
+        commentRepository.save(comment);
+
+        return createSuccessResponse("Hearted comment with ID " + id, !wasHearted, HttpStatus.CREATED);
+    }
+
+    public HeartCommentResponse getHeartComment(int id, String name) {
+        User user = userService.getUserByUsername(name);
+        if (user == null) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        Comment comment = getCommentById(id);
+        if (comment == null) {
+            return createErrorResponse(HttpStatus.NOT_FOUND, "Comment not found");
+        }
+
+        boolean isHearted = comment.getHeartedByUsers().contains(user);
+        return createSuccessResponse(null, isHearted, HttpStatus.OK);
+    }
+
+    private HeartCommentResponse createErrorResponse(HttpStatus status, String message) {
+        return HeartCommentResponse.builder()
+                .status(status)
+                .success(false)
+                .message(message)
+                .hearted(false)
+                .build();
+    }
+
+    private HeartCommentResponse createSuccessResponse(String message, boolean hearted, HttpStatus status) {
+        return HeartCommentResponse.builder()
+                .status(status)
+                .success(true)
+                .message(message)
+                .hearted(hearted)
+                .build();
+    }
+
+    private boolean toggleHeartStatus(Comment comment, User user) {
         boolean wasHearted = comment.getHeartedByUsers().contains(user);
         if (wasHearted) {
             comment.getHeartedByUsers().remove(user);
         } else {
             comment.getHeartedByUsers().add(user);
         }
-        commentRepository.save(comment);
-        return new HeartCommentResult(true, Collections.singletonMap("isHearted", !wasHearted), HttpStatus.OK);
+        return wasHearted;
     }
-
-    public HeartCommentResult getHeartComment(int id, String name) {
-        User user = userService.getUserByUsername(name);
-        if (user == null) {
-            return new HeartCommentResult(false, "User not found", HttpStatus.NOT_FOUND);
-        }
-        Comment comment = getCommentById(id);
-        if (comment == null) {
-            return new HeartCommentResult(false, "No comment found with ID " + id, HttpStatus.NOT_FOUND);
-        }
-        if (comment.getHeartedByUsers().contains(user)) {
-            return new HeartCommentResult(true, Collections.singletonMap("isHearted", true), HttpStatus.OK);
-        }
-        return new HeartCommentResult(true, Collections.singletonMap("isHearted", false), HttpStatus.OK);
-    }
+    
 }

@@ -3,7 +3,7 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.service.CommentService;
-import com.blog.blogspringboot.service.result.HeartCommentResult;
+import com.blog.blogspringboot.model.HeartCommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +42,7 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCommentById(@PathVariable int id) {
+    public ResponseEntity<Object> getCommentById(@PathVariable int id) {
         Comment comment = commentService.getCommentById(id);
         if (comment == null) {
             return ResponseEntity
@@ -59,20 +59,18 @@ public class CommentController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteComment(@PathVariable int id, Principal principal) {
+    public ResponseEntity<Object> deleteComment(@PathVariable int id, Principal principal) {
         HttpStatus status = commentService.deleteComment(id, principal);
         return ResponseEntity.status(status).build();
     }
 
     @PostMapping("/{id}/heart")
-    public ResponseEntity<Object> heartComment(@PathVariable int id, Principal principal) {
-        HeartCommentResult result = commentService.heartComment(id, principal.getName());
-        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    public HeartCommentResponse heartComment(@PathVariable int id, Principal principal) {
+        return commentService.heartComment(id, principal.getName());
     }
 
     @GetMapping("/{id}/heart")
-    public ResponseEntity<Object> getHeartComment(@PathVariable int id, Principal principal) {
-        HeartCommentResult result = commentService.getHeartComment(id, principal.getName());
-        return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    public HeartCommentResponse getHeartComment(@PathVariable int id, Principal principal) {
+        return commentService.getHeartComment(id, principal.getName());
     }
 }
