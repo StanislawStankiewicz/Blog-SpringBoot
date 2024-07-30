@@ -4,7 +4,6 @@ import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.service.CommentService;
 import com.blog.blogspringboot.model.comment.HeartCommentResponse;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
