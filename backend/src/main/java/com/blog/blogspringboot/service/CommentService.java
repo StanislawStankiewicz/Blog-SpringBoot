@@ -1,10 +1,14 @@
 package com.blog.blogspringboot.service;
 
 import com.blog.blogspringboot.dto.CommentRequestDTO;
+import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.entity.User;
+import com.blog.blogspringboot.exceptions.BlogpostNotFoundException;
+import com.blog.blogspringboot.exceptions.CommentNotFoundException;
+import com.blog.blogspringboot.exceptions.ForbiddenException;
+import com.blog.blogspringboot.exceptions.UserNotFoundException;
 import com.blog.blogspringboot.repository.CommentRepository;
-import com.blog.blogspringboot.model.HeartCommentResponse;
 import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +31,16 @@ public class CommentService {
 
     private final BlogpostService blogpostService;
 
-    public Comment saveComment(Comment comment) {
-        return commentRepository.save(comment);
-    }
-
     public Comment createComment(CommentRequestDTO commentRequestDTO, String username) {
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Blogpost blogpost = blogpostService.getBlogpostById(commentRequestDTO.getBlogpostId())
+                .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
+
         Comment comment = Comment.builder()
-                .user(userService.getUserByUsername(username))
-                .blogpost(blogpostService.getBlogpostById(commentRequestDTO.getBlogpostId()))
+                .user(user)
+                .blogpost(blogpost)
                 .content(commentRequestDTO.getContent())
                 .createdAt(new Date())
                 .build();
@@ -50,19 +56,20 @@ public class CommentService {
         return commentRepository.findAll(pageable);
     }
 
-    public HttpStatus deleteComment(int id, Principal principal) {
-        User user = userService.getUserByUsername(principal.getName());
-        Comment comment = getCommentById(id);
-        if (comment == null) {
-            return HttpStatus.NOT_FOUND;
-        }
+    public void deleteComment(int id, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found"));
+
         boolean isModerator = UserUtils.isUserModerator();
         boolean isAuthor = comment.getUser().equals(user);
         if (isModerator || isAuthor) {
             commentRepository.deleteById(id);
-            return HttpStatus.NO_CONTENT;
+            return;
         }
-        return HttpStatus.FORBIDDEN;
+        throw new ForbiddenException("You are not allowed to delete this comment");
     }
 
     public Page<Comment> getAllCommentsByUserId(Integer userId, Pageable pageable) {
@@ -77,54 +84,27 @@ public class CommentService {
         return commentRepository.findByUserIdAndBlogpostId(userId, blogpostId, pageable);
     }
 
-    public HeartCommentResponse heartComment(int id, String username) {
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
-        }
+    public boolean heartComment(int id, String username) {
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Comment comment = getCommentById(id);
-        if (comment == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "No comment found with ID " + id);
-        }
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found"));
 
         boolean wasHearted = toggleHeartStatus(comment, user);
         commentRepository.save(comment);
 
-        return createSuccessResponse("Hearted comment with ID " + id, !wasHearted, HttpStatus.CREATED);
+        return !wasHearted;
     }
 
-    public HeartCommentResponse getHeartComment(int id, String name) {
-        User user = userService.getUserByUsername(name);
-        if (user == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
-        }
+    public boolean getHeartComment(int id, String username) {
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Comment comment = getCommentById(id);
-        if (comment == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "Comment not found");
-        }
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found"));
 
-        boolean isHearted = comment.getHeartedByUsers().contains(user);
-        return createSuccessResponse(null, isHearted, HttpStatus.OK);
-    }
-
-    private HeartCommentResponse createErrorResponse(HttpStatus status, String message) {
-        return HeartCommentResponse.builder()
-                .status(status)
-                .success(false)
-                .message(message)
-                .hearted(false)
-                .build();
-    }
-
-    private HeartCommentResponse createSuccessResponse(String message, boolean hearted, HttpStatus status) {
-        return HeartCommentResponse.builder()
-                .status(status)
-                .success(true)
-                .message(message)
-                .hearted(hearted)
-                .build();
+        return comment.getHeartedByUsers().contains(user);
     }
 
     private boolean toggleHeartStatus(Comment comment, User user) {

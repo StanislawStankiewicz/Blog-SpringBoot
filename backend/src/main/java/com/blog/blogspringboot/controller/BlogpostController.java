@@ -3,8 +3,9 @@ package com.blog.blogspringboot.controller;
 
 import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
+import com.blog.blogspringboot.exceptions.BlogpostNotFoundException;
 import com.blog.blogspringboot.service.BlogpostService;
-import com.blog.blogspringboot.model.HeartBlogpostResponse;
+import com.blog.blogspringboot.model.blogpost.HeartBlogpostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Collections;
 
 @RequiredArgsConstructor
 @RestController
@@ -39,28 +39,33 @@ public class BlogpostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getBlogpostById(@PathVariable int id) {
-        Blogpost blogpost = blogpostService.getBlogpostById(id);
-        if (blogpost == null) {
-            return ResponseEntity
-                    .status(400)
-                    .body(Collections.singletonMap("message", "No blogpost found with ID " + id));
-        }
+        Blogpost blogpost = blogpostService.getBlogpostById(id)
+                .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
+
         return ResponseEntity.ok(blogpost);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBlogpost(@PathVariable int id, Principal principal) {
-        HttpStatus status = blogpostService.deleteBlogpost(id, principal);
-        return ResponseEntity.status(status).build();
+        blogpostService.deleteBlogpost(id, principal.getName());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/{id}/heart")
-    public HeartBlogpostResponse heartBlogpost(@PathVariable int id, Principal principal) {
-        return blogpostService.heartBlogpost(id, principal.getName());
+    public ResponseEntity<HeartBlogpostResponse> heartBlogpost(@PathVariable int id, Principal principal) {
+        boolean hearted = blogpostService.heartBlogpost(id, principal.getName());
+        HeartBlogpostResponse response = HeartBlogpostResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}/heart")
-    public HeartBlogpostResponse getHeartBlogpost(@PathVariable int id, Principal principal) {
-        return blogpostService.getHeartBlogpost(id, principal.getName());
+    public ResponseEntity<HeartBlogpostResponse> getHeartBlogpost(@PathVariable int id, Principal principal) {
+        boolean hearted = blogpostService.getHeartBlogpost(id, principal.getName());
+        HeartBlogpostResponse response = HeartBlogpostResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

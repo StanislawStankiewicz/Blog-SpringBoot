@@ -3,8 +3,10 @@ package com.blog.blogspringboot.service;
 import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.User;
+import com.blog.blogspringboot.exceptions.BlogpostNotFoundException;
+import com.blog.blogspringboot.exceptions.ForbiddenException;
+import com.blog.blogspringboot.exceptions.UserNotFoundException;
 import com.blog.blogspringboot.repository.BlogpostRepository;
-import com.blog.blogspringboot.model.HeartBlogpostResponse;
 import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,7 +29,8 @@ public class BlogpostService {
     private final UserService userService;
 
     public Blogpost createBlogpost(BlogpostRequestDTO blogpostRequestDTO, String username) {
-        User user = userService.getUserByUsername(username);
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         Blogpost blogpost = Blogpost.builder()
                 .user(user)
                 .title(blogpostRequestDTO.getTitle())
@@ -38,80 +42,55 @@ public class BlogpostService {
         return blogpostRepository.save(blogpost);
     }
 
-    public Blogpost getBlogpostById(int id) {
-        return blogpostRepository.findById(id).orElse(null);
+    public Optional<Blogpost> getBlogpostById(int id) {
+        return blogpostRepository.findById(id);
     }
 
     public Page<Blogpost> getAllBlogposts(Pageable pageable) {
         return blogpostRepository.findAll(pageable);
     }
 
-    public HttpStatus deleteBlogpost(int id, Principal principal) {
-        User user = userService.getUserByUsername(principal.getName());
-        Blogpost blogpost = getBlogpostById(id);
-        if (blogpost == null) {
-            return HttpStatus.NOT_FOUND;
-        }
+    public void deleteBlogpost(int id, String username) {
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Blogpost blogpost = blogpostRepository.findById(id)
+                .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
+
         boolean isModerator = UserUtils.isUserAdmin();
         boolean isAuthor = blogpost.getUser().equals(user);
         if (isModerator || isAuthor) {
             blogpostRepository.deleteById(id);
-            return HttpStatus.NO_CONTENT;
+            return;
         }
-        return HttpStatus.FORBIDDEN;
+        throw new ForbiddenException("You are not allowed to delete this blogpost");
     }
 
     public Page<Blogpost> getAllBlogpostsByUserId(Integer userId, Pageable pageable) {
         return blogpostRepository.findAllByUserId(userId, pageable);
     }
 
-    public HeartBlogpostResponse heartBlogpost(int id, String name) {
-        User user = userService.getUserByUsername(name);
-        if (user == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
-        }
+    public boolean heartBlogpost(int id, String name) {
+        User user = userService.getUserByUsername(name)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Blogpost blogpost = getBlogpostById(id);
-        if (blogpost == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "Blogpost not found");
-        }
+        Blogpost blogpost = blogpostRepository.findById(id)
+                .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
 
-        boolean wasHearted = toggleHeartStatus(blogpost, user);
+        boolean hearted = toggleHeartStatus(blogpost, user);
         blogpostRepository.save(blogpost);
 
-        return createSuccessResponse(!wasHearted);
+        return hearted;
     }
 
-    public HeartBlogpostResponse getHeartBlogpost(int id, String name) {
-        User user = userService.getUserByUsername(name);
-        if (user == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "User not found");
-        }
+    public boolean getHeartBlogpost(int id, String name) {
+        User user = userService.getUserByUsername(name)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Blogpost blogpost = getBlogpostById(id);
-        if (blogpost == null) {
-            return createErrorResponse(HttpStatus.NOT_FOUND, "Blogpost not found");
-        }
+        Blogpost blogpost = blogpostRepository.findById(id)
+                .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
 
-        boolean hearted = isBlogpostHeartedByUser(blogpost, user);
-        return createSuccessResponse(hearted);
-    }
-
-    private HeartBlogpostResponse createErrorResponse(HttpStatus status, String message) {
-        return HeartBlogpostResponse.builder()
-                .status(status)
-                .success(false)
-                .message(message)
-                .hearted(false)
-                .build();
-    }
-
-    private HeartBlogpostResponse createSuccessResponse(boolean hearted) {
-        return HeartBlogpostResponse.builder()
-                .status(HttpStatus.OK)
-                .success(true)
-                .hearted(hearted)
-                .build();
+        return isBlogpostHeartedByUser(blogpost, user);
     }
 
     private boolean toggleHeartStatus(Blogpost blogpost, User user) {
@@ -121,7 +100,7 @@ public class BlogpostService {
         } else {
             blogpost.getHeartedByUsers().add(user);
         }
-        return wasHearted;
+        return !wasHearted;
     }
 
     private boolean isBlogpostHeartedByUser(Blogpost blogpost, User user) {

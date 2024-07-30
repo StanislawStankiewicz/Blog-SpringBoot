@@ -1,9 +1,9 @@
 package com.blog.blogspringboot.controller;
 
-import com.blog.blogspringboot.model.LoginRequest;
-import com.blog.blogspringboot.model.LoginResponse;
-import com.blog.blogspringboot.model.RegisterRequest;
-import com.blog.blogspringboot.model.RegisterResponse;
+import com.blog.blogspringboot.model.auth.LoginRequest;
+import com.blog.blogspringboot.model.auth.LoginResponse;
+import com.blog.blogspringboot.model.auth.RegisterRequest;
+import com.blog.blogspringboot.model.auth.RegisterResponse;
 import com.blog.blogspringboot.service.AuthorizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,8 +52,7 @@ public class AuthorizationController {
         LoginResponse result = authorizationService.attemptLogin(username, password);
 
         return ResponseEntity
-                .status(result.getStatus())
-                .body(result);
+                .ok(result);
     }
 
     @Operation(summary = "Register a new user")
@@ -88,10 +87,12 @@ public class AuthorizationController {
         String password = request.getPassword();
         String email = request.getEmail();
 
-        RegisterResponse result = authorizationService.attemptRegister(username, password, email);
+        authorizationService.attemptRegister(username, password, email);
 
         return ResponseEntity
-                .status(result.getStatus())
-                .body(result);
+                .status(201)
+                .body(RegisterResponse.builder()
+                        .message("User registered successfully.")
+                        .build());
     }
 }

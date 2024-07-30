@@ -3,7 +3,8 @@ package com.blog.blogspringboot.controller;
 import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.service.CommentService;
-import com.blog.blogspringboot.model.HeartCommentResponse;
+import com.blog.blogspringboot.model.comment.HeartCommentResponse;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,17 +61,25 @@ public class CommentController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteComment(@PathVariable int id, Principal principal) {
-        HttpStatus status = commentService.deleteComment(id, principal);
-        return ResponseEntity.status(status).build();
+        commentService.deleteComment(id, principal);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/{id}/heart")
-    public HeartCommentResponse heartComment(@PathVariable int id, Principal principal) {
-        return commentService.heartComment(id, principal.getName());
+    public ResponseEntity<HeartCommentResponse> heartComment(@PathVariable int id, Principal principal) {
+        boolean hearted =  commentService.heartComment(id, principal.getName());
+        HeartCommentResponse response = HeartCommentResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}/heart")
-    public HeartCommentResponse getHeartComment(@PathVariable int id, Principal principal) {
-        return commentService.getHeartComment(id, principal.getName());
+    public ResponseEntity<HeartCommentResponse> getHeartComment(@PathVariable int id, Principal principal) {
+        boolean hearted = commentService.getHeartComment(id, principal.getName());
+        HeartCommentResponse response = HeartCommentResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

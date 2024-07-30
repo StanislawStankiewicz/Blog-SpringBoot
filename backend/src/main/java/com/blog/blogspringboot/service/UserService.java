@@ -1,12 +1,14 @@
 package com.blog.blogspringboot.service;
 
 import com.blog.blogspringboot.entity.User;
+import com.blog.blogspringboot.exceptions.UserNotFoundException;
 import com.blog.blogspringboot.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -24,11 +26,15 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        return userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return user;
     }
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public List<User> getAllUsers() {

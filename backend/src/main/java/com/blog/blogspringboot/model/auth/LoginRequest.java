@@ -1,4 +1,4 @@
-package com.blog.blogspringboot.model;
+package com.blog.blogspringboot.model.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class LoginRequest {
     private String username;
 
     private String password;
-
-    private String email;
 }

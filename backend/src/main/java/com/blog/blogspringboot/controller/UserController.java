@@ -28,11 +28,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@AuthenticationPrincipal UserPrincipal principal, @PathVariable int id) {
         User user = userService.getUserById(id);
-        if (user == null) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("message", "No user found with ID " + id + "Btw you are " + principal.getUsername()));
-        }
         return ResponseEntity.ok(user);
     }
 }

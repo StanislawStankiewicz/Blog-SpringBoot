@@ -1,4 +1,4 @@
-package com.blog.blogspringboot.model;
+package com.blog.blogspringboot.model.blogpost;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,11 +12,6 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HeartBlogpostResponse {
-
-    @JsonIgnore
-    private HttpStatus status;
-
-    private boolean success;
 
     private String message;
 

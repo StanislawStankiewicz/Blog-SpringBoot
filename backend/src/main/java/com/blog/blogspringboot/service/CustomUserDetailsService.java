@@ -22,10 +22,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         Set<Role> roles = user.getRoles();
         Collection<? extends GrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName())) // Replace getRoleName() with the actual method/field in Role that represents the authority
