@@ -103,4 +103,50 @@ public class BlogpostController {
         blogpostService.deleteBlogpost(id, principal.getName());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @Operation(summary = "Heart a blog post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Blog post hearted successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartBlogpostResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": true }"))
+                    }),
+            @ApiResponse(responseCode = "404", description = "Blog post not found",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartBlogpostResponse.class))
+                    })
+    })
+    @PostMapping("/{id}/heart")
+    public ResponseEntity<HeartBlogpostResponse> heartBlogpost(@PathVariable int id, Principal principal) {
+        boolean hearted = blogpostService.heartBlogpost(id, principal.getName());
+        HeartBlogpostResponse response = HeartBlogpostResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Get heart status of a blog post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Heart status retrieved successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartBlogpostResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": true }"))
+                    }),
+            @ApiResponse(responseCode = "404", description = "Blog post not found",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartBlogpostResponse.class))
+                    })
+    })
+    @GetMapping("/{id}/heart")
+    public ResponseEntity<HeartBlogpostResponse> getHeartBlogpost(@PathVariable int id, Principal principal) {
+        boolean hearted = blogpostService.getHeartBlogpost(id, principal.getName());
+        HeartBlogpostResponse response = HeartBlogpostResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

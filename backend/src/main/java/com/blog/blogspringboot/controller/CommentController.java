@@ -2,6 +2,7 @@ package com.blog.blogspringboot.controller;
 
 import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
+import com.blog.blogspringboot.model.comment.HeartCommentResponse;
 import com.blog.blogspringboot.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,5 +82,53 @@ public class CommentController {
     public ResponseEntity<Object> deleteComment(@PathVariable int id, Principal principal) {
         commentService.deleteComment(id, principal);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Heart a comment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Comment hearted successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartCommentResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": true }"))
+                    }),
+            @ApiResponse(responseCode = "404", description = "Comment not found",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartCommentResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": false }"))
+                    })
+    })
+    @PostMapping("/{id}/heart")
+    public ResponseEntity<HeartCommentResponse> heartComment(@PathVariable int id, Principal principal) {
+        boolean hearted =  commentService.heartComment(id, principal.getName());
+        HeartCommentResponse response = HeartCommentResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Get heart status of a comment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Heart status retrieved successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartCommentResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": true }"))
+                    }),
+            @ApiResponse(responseCode = "404", description = "Comment not found",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = HeartCommentResponse.class),
+                                    examples = @ExampleObject(value = "{ \"hearted\": false }"))
+                    })
+    })
+    @GetMapping("/{id}/heart")
+    public ResponseEntity<HeartCommentResponse> getHeartComment(@PathVariable int id, Principal principal) {
+        boolean hearted = commentService.getHeartComment(id, principal.getName());
+        HeartCommentResponse response = HeartCommentResponse.builder()
+                .hearted(hearted)
+                .build();
+        return ResponseEntity.ok(response);
     }
 }
