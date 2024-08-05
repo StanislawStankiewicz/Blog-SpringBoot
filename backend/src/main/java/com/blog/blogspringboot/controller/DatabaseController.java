@@ -35,11 +35,7 @@ public class DatabaseController {
     })
     @DeleteMapping("/nuke/db")
     public ResponseEntity<Object> restartDatabase() {
-        try {
-            databaseService.restartDatabase();
-            return ResponseEntity.ok("Database has been restarted successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to restart the database: " + e.getMessage());
-        }
+        databaseService.restartDatabase();
+        return ResponseEntity.ok("Database has been restarted successfully.");
     }
 }

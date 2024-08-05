@@ -4,7 +4,7 @@ import com.blog.blogspringboot.dto.CommentRequestDTO;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.model.comment.HeartCommentResponse;
 import com.blog.blogspringboot.service.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,15 +19,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.security.Principal;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
     private final CommentService commentService;
-
-    @Autowired
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
 
     @Operation(summary = "Get all comments")
     @ApiResponses(value = {

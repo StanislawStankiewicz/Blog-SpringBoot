@@ -11,6 +11,9 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
 
-    @Schema(description = "Access token for the user")
-    private final String accessToken;
+    private final boolean success;
+
+    private final String message;
+
+    private final String username;
 }

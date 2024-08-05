@@ -1,7 +1,6 @@
 package com.blog.blogspringboot.service;
 
 import com.blog.blogspringboot.entity.User;
-import com.blog.blogspringboot.exceptions.UserNotFoundException;
 import com.blog.blogspringboot.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +24,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getUserById(int id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            throw new UserNotFoundException("User not found");
-        }
-        return user;
+    public Optional<User> getUserById(int id) {
+        return userRepository.findById(id);
     }
 
     public Optional<User> getUserByUsername(String username) {

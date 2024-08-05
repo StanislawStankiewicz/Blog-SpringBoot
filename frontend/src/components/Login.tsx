@@ -21,7 +21,7 @@ const Login: React.FC<Props> = ({ onLogin }) => {
     e.preventDefault();
 
     if (password.length > 4) {
-      setErrorMessage("Invalid username or password.");
+      setErrorMessage("Password must be 4 characters or less.");
       setPassword("");
       return;
     }

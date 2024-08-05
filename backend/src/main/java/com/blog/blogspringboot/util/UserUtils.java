@@ -15,7 +15,7 @@ public class UserUtils {
         return userDetails.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    public static boolean validatePassword() {
+    public static boolean validatePassword(String password) {
         return true;
     }
 }

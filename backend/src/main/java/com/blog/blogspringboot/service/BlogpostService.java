@@ -82,12 +82,14 @@ public class BlogpostService {
     }
 
     public boolean getHeartBlogpost(int id, String name) {
+        System.out.println("getHeartBlogpost");
+        System.out.println("id: " + id);
+        System.out.println("name: " + name);
         User user = userService.getUserByUsername(name)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
         Blogpost blogpost = blogpostRepository.findById(id)
                 .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
-
+        System.out.println("blogpost: " + blogpost);
         return isBlogpostHeartedByUser(blogpost, user);
     }
 

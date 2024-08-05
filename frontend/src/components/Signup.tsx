@@ -22,21 +22,22 @@ function Signup() {
       password,
       email,
     };
-
+    let ok;
     const response = await fetch("/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(signupRequest),
-    }).then((res) => res.json());
+    }).then((res) => {
+      ok = res.ok;
+      return res.json();
+    });
 
-    if (!response.success) {
-      setErrorMessage(response.message);
-      setSuccessMessage(null);
+    if (ok) {
+      setSuccessMessage(response.message);
     } else {
-      setErrorMessage(null);
-      setSuccessMessage("User succefssfully created.");
+      setErrorMessage(response.message);
     }
   }
 

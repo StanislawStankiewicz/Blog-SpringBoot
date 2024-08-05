@@ -7,12 +7,10 @@ import "./HeartButton.css"; // Make sure to import the CSS file where the .muted
 export default function Comments({
   comments,
   username,
-  token,
   blogpostId,
 }: {
   comments: CommentT[] | undefined;
   username: string | null;
-  token: string | null;
   blogpostId: number;
 }) {
   const [newComment, setNewComment] = useState("");
@@ -42,8 +40,8 @@ export default function Comments({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
       body: JSON.stringify(commentRequest),
     })
       .then((res) => res.json())
@@ -73,7 +71,6 @@ export default function Comments({
               <HeartButton
                 initialCount={comment.hearts}
                 size={16}
-                token={token}
                 path="comments"
                 id={comment.id}
                 locked={!username}

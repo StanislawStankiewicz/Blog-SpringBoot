@@ -1,20 +1,20 @@
 interface Props {
-  token: string | null;
+  username: string | null;
 }
 
-function RestartDatabaseButton({ token }: Props) {
+function RestartDatabaseButton({ username }: Props) {
   async function handleRestartDatabase() {
     const userConfirmed = window.confirm(
       "Are you sure you want to restart the database? This action cannot be undone."
     );
 
-    if (userConfirmed && token) {
+    if (userConfirmed) {
       const response = await fetch("/nuke/db", {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -31,7 +31,7 @@ function RestartDatabaseButton({ token }: Props) {
       <button
         className="btn btn-danger"
         onClick={handleRestartDatabase}
-        disabled={!token}
+        disabled={!username}
       >
         Restart Database
       </button>

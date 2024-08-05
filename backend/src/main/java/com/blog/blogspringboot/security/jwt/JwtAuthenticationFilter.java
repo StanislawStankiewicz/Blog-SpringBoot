@@ -3,14 +3,17 @@ package com.blog.blogspringboot.security.jwt;
 import com.blog.blogspringboot.security.UserPrincipalAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -22,8 +25,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtToPrincipalConverter jwtToPrincipalConverter;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException
     {
@@ -31,15 +34,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .map(jwtDecoder::decode)
                 .map(jwtToPrincipalConverter::convert)
                 .map(UserPrincipalAuthenticationToken::new)
-                .ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+                .ifPresent(authentication -> SecurityContextHolder.getContext()
+                        .setAuthentication(authentication));
 
         filterChain.doFilter(request, response);
     }
 
     private Optional<String> extractTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return Optional.of(bearerToken.substring(7));
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies())
+                    .filter(cookie -> "access_token".equals(cookie.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst();
         }
         return Optional.empty();
     }

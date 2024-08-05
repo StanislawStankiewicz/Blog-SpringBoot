@@ -6,12 +6,10 @@ import HeartButton from "./HeartButton";
 export default function Blogpost({
   post,
   username,
-  token,
   id,
 }: {
   post: Blogpost;
   username: string | null;
-  token: string | null;
   id: number;
 }) {
   return (
@@ -32,7 +30,6 @@ export default function Blogpost({
         <div className="d-flex justify-content-end">
           <HeartButton
             initialCount={post.hearts}
-            token={token}
             path="blogposts"
             id={id}
             locked={!username}
@@ -43,7 +40,6 @@ export default function Blogpost({
         <Comments
           comments={post.comments}
           username={username}
-          token={token}
           blogpostId={id}
         />
       </div>

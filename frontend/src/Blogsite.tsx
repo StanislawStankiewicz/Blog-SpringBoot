@@ -12,7 +12,6 @@ import InfoCard from "./components/InfoCard";
 
 function Blogsite() {
   const [username, setUsername] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [posts, setPosts] = useState<BlogpostT[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [slideIn, setSlideIn] = useState(false);
@@ -20,8 +19,29 @@ function Blogsite() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("token: " + token);
-  }, [token]);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/auth/verify", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Ensure cookies are included in the request
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUsername(data.username);
+        } else {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        navigate("/login");
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     async function fetchBlogposts(): Promise<BlogpostT[]> {
@@ -52,21 +72,23 @@ function Blogsite() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(loginRequest),
-    }).then((res) => res.json());
+      credentials: "include", // Ensure cookies are included in the request
+    });
 
-    if (response.accessToken) {
+    const data = await response.json();
+    if (response.ok) {
       setUsername(username);
-      setToken(response.accessToken);
       navigate("/");
-      return { success: true, message: "", accessToken: response.accessToken };
+      return { success: true, message: "", accessToken: data.accessToken };
     } else {
-      return { success: false, message: response.message, accessToken: null };
+      return { success: false, message: data.message, accessToken: null };
     }
   }
 
   function handleLogout() {
     setUsername(null);
-    setToken(null);
+    document.cookie =
+      "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     navigate("/");
   }
 
@@ -150,7 +172,6 @@ function Blogsite() {
                       }
                     >
                       <CreateBlogForm
-                        token={token}
                         onPostCreated={(post) => {
                           setPosts([...posts, post]);
                           toggleCreateForm();
@@ -158,12 +179,12 @@ function Blogsite() {
                       />
                     </div>
                   )}
-                  <Blogposts posts={posts} username={username} token={token} />
+                  <Blogposts posts={posts} username={username} />
                 </>
               }
             />
           </Routes>
-          <RestartDatabaseButton token={token} />
+          <RestartDatabaseButton username={username} />
         </div>
       </div>
     </div>

@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Blogpost } from "../types/Blogpost.type";
 
 function CreateBlogForm({
-  token,
   onPostCreated,
 }: {
-  token: string | null;
+  username?: string;
   onPostCreated: (post: Blogpost) => void;
 }) {
   const [newTitle, setNewTitle] = useState("");
@@ -24,8 +23,8 @@ function CreateBlogForm({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
       body: JSON.stringify(postRequest),
     }).then((res) => res.json());
 

@@ -6,7 +6,6 @@ import "./HeartButton.css"; // Make sure to import the CSS file where the .muted
 interface HeartButtonProps {
   initialCount: number;
   size?: number;
-  token: string | null;
   path: "comments" | "blogposts";
   id: number;
   locked?: boolean;
@@ -15,7 +14,6 @@ interface HeartButtonProps {
 const HeartButton: React.FC<HeartButtonProps> = ({
   initialCount,
   size = 20,
-  token,
   path,
   id,
   locked = false,
@@ -25,7 +23,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 
   useEffect(() => {
     if (locked) return;
-    fetchHearted(token!, path, id)
+    fetchHearted(path, id)
       .then((res) => res.json())
       .then((response) => {
         if (response && response.hearted !== clicked) {
@@ -38,7 +36,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
     if (locked) return;
     setClicked(!clicked);
     setCount(clicked ? count - 1 : count + 1);
-    fetchHearted(token!, path, id, "POST")
+    fetchHearted(path, id, "POST")
       .then((res) => res.json())
       .then(async (response) => {
         if (response.hearted !== clicked) {
@@ -70,7 +68,6 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 export default HeartButton;
 
 function fetchHearted(
-  token: string,
   path: string,
   id: number,
   method: "GET" | "POST" = "GET"
@@ -79,7 +76,7 @@ function fetchHearted(
     method: method,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
   });
 }
