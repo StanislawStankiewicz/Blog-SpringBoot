@@ -1,6 +1,6 @@
 package com.blog.blogspringboot.controller;
 
-import com.blog.blogspringboot.dto.BlogpostRequestDTO;
+import com.blog.blogspringboot.model.blogpost.PostBlogpostRequest;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.exceptions.BlogpostNotFoundException;
 import com.blog.blogspringboot.service.BlogpostService;
@@ -43,7 +43,7 @@ public class BlogpostController {
                     })
     })
     @PostMapping
-    public ResponseEntity<Object> createBlogpost(Principal principal, @RequestBody BlogpostRequestDTO blogpost) {
+    public ResponseEntity<Object> createBlogpost(Principal principal, @RequestBody PostBlogpostRequest blogpost) {
         Blogpost createdBlogpost = blogpostService.createBlogpost(blogpost, principal.getName());
         return ResponseEntity.ok(createdBlogpost);
     }

@@ -1,11 +1,11 @@
 package com.blog.blogspringboot.service;
 
-import com.blog.blogspringboot.dto.BlogpostRequestDTO;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.User;
 import com.blog.blogspringboot.exceptions.BlogpostNotFoundException;
 import com.blog.blogspringboot.exceptions.ForbiddenException;
 import com.blog.blogspringboot.exceptions.UserNotFoundException;
+import com.blog.blogspringboot.model.blogpost.PostBlogpostRequest;
 import com.blog.blogspringboot.repository.BlogpostRepository;
 import com.blog.blogspringboot.util.UserUtils;
 import jakarta.transaction.Transactional;
@@ -26,13 +26,13 @@ public class BlogpostService {
 
     private final UserService userService;
 
-    public Blogpost createBlogpost(BlogpostRequestDTO blogpostRequestDTO, String username) {
+    public Blogpost createBlogpost(PostBlogpostRequest postBlogpostRequest, String username) {
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Blogpost blogpost = Blogpost.builder()
                 .user(user)
-                .title(blogpostRequestDTO.getTitle())
-                .content(blogpostRequestDTO.getContent())
+                .title(postBlogpostRequest.getTitle())
+                .content(postBlogpostRequest.getContent())
                 .hearts(0)
                 .createdAt(new Date())
                 .build();

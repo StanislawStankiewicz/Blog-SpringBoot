@@ -1,11 +1,11 @@
-package com.blog.blogspringboot.dto;
+package com.blog.blogspringboot.model.comment;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CommentRequestDTO {
+public class PostCommentRequest {
     private int blogpostId;
     private String content;
 }

@@ -1,6 +1,6 @@
 package com.blog.blogspringboot.controller;
 
-import com.blog.blogspringboot.dto.CommentRequestDTO;
+import com.blog.blogspringboot.model.comment.PostCommentRequest;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.model.comment.HeartCommentResponse;
 import com.blog.blogspringboot.service.CommentService;
@@ -59,7 +59,7 @@ public class CommentController {
                     })
     })
     @PostMapping
-    public ResponseEntity<Object> createComment(Principal principal, @RequestBody CommentRequestDTO comment) {
+    public ResponseEntity<Object> createComment(Principal principal, @RequestBody PostCommentRequest comment) {
         Comment createdComment = commentService.createComment(comment, principal.getName());
         return ResponseEntity.ok(createdComment);
     }

@@ -1,6 +1,6 @@
 package com.blog.blogspringboot.service;
 
-import com.blog.blogspringboot.dto.CommentRequestDTO;
+import com.blog.blogspringboot.model.comment.PostCommentRequest;
 import com.blog.blogspringboot.entity.Blogpost;
 import com.blog.blogspringboot.entity.Comment;
 import com.blog.blogspringboot.entity.User;
@@ -30,17 +30,17 @@ public class CommentService {
 
     private final BlogpostService blogpostService;
 
-    public Comment createComment(CommentRequestDTO commentRequestDTO, String username) {
+    public Comment createComment(PostCommentRequest postCommentRequest, String username) {
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Blogpost blogpost = blogpostService.getBlogpostById(commentRequestDTO.getBlogpostId())
+        Blogpost blogpost = blogpostService.getBlogpostById(postCommentRequest.getBlogpostId())
                 .orElseThrow(() -> new BlogpostNotFoundException("Blogpost not found"));
 
         Comment comment = Comment.builder()
                 .user(user)
                 .blogpost(blogpost)
-                .content(commentRequestDTO.getContent())
+                .content(postCommentRequest.getContent())
                 .createdAt(new Date())
                 .build();
 
